@@ -46,37 +46,69 @@ CodeSense intercepts every pull request the moment it is created, analyzes it ag
 
 ## Architecture
 
-```
-GitHub Pull Request
-        |
-        v
-Webhook Handler (Go :8080)
-  - HMAC-SHA256 validation
-  - Writes PENDING review to PostgreSQL
-  - Pushes job to Redis queue
-        |
-        v
-Review Worker (Go)
-  - Fetches PR diff from GitHub API
-  - Forwards diff to Code Intelligence service
-        |
-        v
-Code Intelligence (Python :8082)
-  - AST parsing via tree-sitter
-  - CodeBERT embeddings stored in ChromaDB
-  - Hybrid search: keyword + semantic vector retrieval
-  - Groq LLM call with retrieved context
-        |
-        v
-Review Worker
-  - Posts comments to GitHub PR
-  - Stores results in PostgreSQL
-  - Publishes event to Redis Pub/Sub
-        |
-        v
-API Server (Go :8083)  -->  React Dashboard (:3000)
-  - WebSocket hub receives Pub/Sub events
-  - Real-time review progress streamed to browser
+```mermaid
+flowchart TD
+    subgraph External["External Clients & Providers"]
+        GH["GitHub<br/>(PR Events & Diff API)"]
+        Browser["Developer Browser<br/>(React Dashboard :3000)"]
+        Groq["Groq Cloud API<br/>(LLaMA 3 / Mixtral Inference)"]
+    end
+
+    subgraph Ingestion["Ingestion Layer"]
+        WH["Webhook Handler (Go :8080)<br/>• HMAC-SHA256 Secret Verification<br/>• Enqueue PR Job to Redis"]
+    end
+
+    subgraph Messaging["Queue & Cache"]
+        Redis[("Redis 7<br/>• Job Queue (LPUSH / BRPOP)<br/>• Pub/Sub Event Broadcast")]
+    end
+
+    subgraph Processing["Background Worker"]
+        RW["Review Worker (Go)<br/>• Fetches PR Diff from GitHub<br/>• Coordinates AI Review<br/>• Posts Comments & Stores Results"]
+    end
+
+    subgraph AI_Engine["Code Intelligence Service (Python / FastAPI :8082)"]
+        direction TB
+        AST["Tree-sitter AST Parser<br/>(Python / Go / JS)"]
+        Embed["CodeBERT (768-dim)<br/>(Dense Vector Generator)"]
+        Hybrid["Hybrid Search & RRF Engine<br/>(Keyword BM25 + Semantic Vector)"]
+        PromptEngine["Prompt Engineering<br/>(Strict Line Mapping & Feedback Context)"]
+        
+        AST --> Embed
+        Embed --> Hybrid
+        Hybrid --> PromptEngine
+    end
+
+    subgraph Persistence["Databases & Storage"]
+        Postgres[("PostgreSQL 16<br/>• Repositories & Review Records<br/>• Inline Code Snippets & Feedback")]
+        Chroma[("ChromaDB Vector Store<br/>• Codebase AST Embeddings")]
+    end
+
+    subgraph Gateway["API & Live Gateway"]
+        APIServer["API Server (Go :8083)<br/>• REST API Endpoints<br/>• WebSocket Hub (/ws/live)"]
+    end
+
+    %% Pipeline Flow
+    GH -->|"1. PR Created/Updated Webhook"| WH
+    WH -->|"2. Write PENDING status"| Postgres
+    WH -->|"3. Push Job (LPUSH review_jobs)"| Redis
+
+    Redis -->|"4. Dequeue Job (BRPOP)"| RW
+    RW -->|"5. Fetch PR Diff"| GH
+    RW -->|"6. POST /review (Diff + Repo Context)"| AI_Engine
+
+    Hybrid <-->|"Query Codebase Vectors"| Chroma
+    PromptEngine -->|"7. Context-Enriched Inference"| Groq
+    Groq -->|"8. AI Review Suggestions"| PromptEngine
+
+    AI_Engine -->|"9. Return Structured Comments"| RW
+    RW -->|"10. Post Review Comments to PR"| GH
+    RW -->|"11. Persist Results & Snippets"| Postgres
+    RW -->|"12. Publish Event"| Redis
+
+    Redis -->|"13. Consume Pub/Sub"| APIServer
+    APIServer -->|"14. Stream Real-time Updates"| Browser
+    Browser -->|"15. Accept / Reject Feedback"| APIServer
+    APIServer -->|"16. Update Feedback Loop"| Postgres
 ```
 
 **Data Flow**
@@ -343,4 +375,4 @@ JWT authentication required.
 
 ## License
 
-MIT
+Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more details.

@@ -1,0 +1,450 @@
+import os
+import subprocess
+import PyPDF2
+
+html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Resume Prep CodeSense</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 14mm 16mm 14mm 16mm;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    color: #1e293b;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+  }
+  h1 {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 12px 0;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 6px;
+  }
+  h3 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #1e40af;
+    margin: 16px 0 6px 0;
+  }
+  h4 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 12px 0 4px 0;
+  }
+  p {
+    margin: 0 0 8px 0;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #cbd5e1;
+    margin: 12px 0;
+  }
+  ul, ol {
+    margin: 0 0 8px 0;
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 4px;
+  }
+  pre {
+    background-color: #0f172a;
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 8.5pt;
+    line-height: 1.45;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin: 10px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  code {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 8.8pt;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+  }
+  pre code {
+    background: transparent;
+    border: none;
+    color: inherit;
+    padding: 0;
+  }
+  blockquote {
+    border-left: 4px solid #3b82f6;
+    background-color: #eff6ff;
+    margin: 10px 0;
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    color: #1e3a8a;
+    font-style: italic;
+  }
+  blockquote p {
+    margin: 0 0 6px 0;
+  }
+  blockquote p:last-child {
+    margin: 0;
+  }
+  strong {
+    color: #0f172a;
+  }
+</style>
+</head>
+<body>
+
+<p>Here is the complete, beginner-to-expert breakdown of this bullet point.</p>
+
+<hr>
+
+<h3>The 10-Second Intuitive Mental Model</h3>
+
+<p>Imagine you ask an AI to review a single new chapter of a book.</p>
+<ul>
+  <li><strong>Normal AI:</strong> Reads only that one chapter in total isolation and guesses how the characters usually talk.</li>
+  <li><strong>What this line means:</strong> Before asking the AI to review your new code, your system <strong>digs into the rest of your codebase</strong>, finds <strong>2 or 3 existing functions that do almost the exact same thing</strong>, and pastes them into the prompt as reference examples so the AI doesn't hallucinate.</li>
+</ul>
+
+<hr>
+
+<h3>Breaking Down Every Piece of the Bullet</h3>
+
+<p>Let’s dissect the sentence phrase by phrase:</p>
+
+<pre>
+[Engineered a hybrid RAG engine]
+  ├── combining [Tree-Sitter AST parsing across 4 languages]
+  ├── with [768-dimensional CodeBERT embeddings in ChromaDB]
+  ├── fusing [dense vector similarity] with [sparse BM25 retrieval]
+  ├── via [Reciprocal Rank Fusion (k=60)]
+└── to [enrich LLM prompts with codebase context]
+</pre>
+
+<hr>
+
+<h4>1. <em>"Tree-Sitter AST parsing across 4 languages"</em></h4>
+<ul>
+  <li><strong>The Problem:</strong> Code is not like an English essay. If you chunk code by "every 50 lines", you might slice a function right in half, cutting off its variables or return statement.</li>
+  <li><strong>What Tree-Sitter is:</strong> A fast, industrial grammar parser originally built by GitHub.</li>
+  <li><strong>What an AST (Abstract Syntax Tree) is:</strong> It turns messy code text into a neat branching family tree of syntax nodes:
+    <p style="text-align: center; font-weight: 600; margin: 6px 0;">File &longrightarrow; Function Definition &longrightarrow; Parameters, Body, Return</p>
+  </li>
+  <li><strong>Across 4 languages:</strong> In your project (<code>ast_parser.py</code>), Tree-Sitter parses <strong>Python, Go, JavaScript, and TypeScript</strong>.</li>
+  <li><strong>Why it matters:</strong> It guarantees that every chunk of code we send to our AI is a complete, self-contained function rather than broken lines.</li>
+</ul>
+
+<hr>
+
+<h4>2. <em>"768-dimensional CodeBERT embeddings in ChromaDB"</em></h4>
+<ul>
+  <li><strong>What an Embedding is:</strong> Computers cannot do math on words. An embedding model turns a piece of code into a list of numbers (a vector coordinate).</li>
+  <li><strong>What CodeBERT is:</strong> A Transformer neural network pre-trained by Microsoft on millions of code files. It outputs a list of <strong>exactly 768 decimal numbers</strong> for every function.</li>
+  <li><strong>What ChromaDB is:</strong> A specialized <strong>Vector Database</strong>. Instead of searching by spelling like Google (A-Z), ChromaDB searches by <strong>mathematical distance</strong>:
+    <ul>
+      <li>If Developer A writes <code>delete_user(uid)</code> and Developer B writes <code>remove_account(id)</code>, CodeBERT gives them nearly identical 768 coordinates because they <strong>mean the same thing</strong>!</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h4>3. <em>"Fusing dense vector similarity with sparse BM25 retrieval"</em></h4>
+<p>Why do we need two different search engines?</p>
+<ul>
+  <li><strong>Dense Vector Search (CodeBERT):</strong> Great at understanding <strong>intent and synonyms</strong> (<code>remove</code> &approx; <code>delete</code>), but sometimes misses exact variable names like <code>MAX_RETRY_TIMEOUT_V2</code>.</li>
+  <li><strong>Sparse Search (BM25 / Keyword):</strong> Great at finding <strong>exact matching words and specific variable names</strong>, but completely blind to synonyms.</li>
+  <li><strong>Hybrid Search:</strong> We run <strong>both</strong> at the same time so we get the best of both worlds: semantic understanding + exact keyword precision.</li>
+</ul>
+
+<hr>
+
+<h4>4. <em>"via Reciprocal Rank Fusion (k=60)"</em></h4>
+<ul>
+  <li><strong>The Problem:</strong> You have two different search engines giving two different score types:
+    <ul>
+      <li>ChromaDB gives a Cosine Similarity score (e.g., <code>0.92</code>).</li>
+      <li>BM25 gives a keyword frequency score (e.g., <code>14.8</code>).</li>
+      <li>You cannot simply add <code>0.92 + 14.8</code>—that would be like adding 5 kilometers to 20 pounds!</li>
+    </ul>
+  </li>
+  <li><strong>The Solution (RRF):</strong> Instead of adding their raw scores, you look at their <strong>rankings</strong> (1st place, 2nd place, 3rd place).</li>
+  <li><strong>The Formula:</strong>
+    <p style="text-align: center; font-weight: bold; margin: 8px 0;">$$RRF(d) = \sum_{m \in \{\text{dense}, \text{sparse}\}} \frac{1}{60 + \text{rank}_m(d)}$$</p>
+  </li>
+  <li><strong>Why k=60?:</strong> 60 is the standard constant from research (Cormack et al.). It prevents an outlier ranked #1 in only one engine from unfairly dominating an item that ranked #2 in both engines.</li>
+</ul>
+
+<hr>
+
+<h4>5. <em>"to enrich LLM prompts with codebase context"</em></h4>
+<ul>
+  <li>This is the final payoff of RAG.</li>
+  <li>Instead of sending Groq/LLaMA an empty prompt:
+    <blockquote><em>"Review this diff: [code]"</em></blockquote>
+  </li>
+  <li>We send an <strong>enriched prompt</strong>:
+    <blockquote>
+      <em>"Review this diff: [code].<br>
+      For reference, here are 2 functions already written in this repository that do something similar: [Function A, Function B].<br>
+      Make sure the new code follows the same patterns!"</em>
+    </blockquote>
+  </li>
+</ul>
+
+<hr>
+
+<h3>How to Explain This in an Interview (Verbal Script)</h3>
+
+<p>If an interviewer points to this bullet and asks:<br>
+<strong>"Can you walk me through your retrieval pipeline?"</strong></p>
+
+<p><strong>Your Answer:</strong></p>
+<blockquote>
+  <em>"When a PR arrives, we don't just send raw diff lines to the LLM. First, we use Tree-Sitter to parse the code into an Abstract Syntax Tree across Python, Go, JS, and TS, allowing us to extract complete syntactic functions instead of arbitrary line chunks.<br><br>
+  Next, we generate 768-dimensional vector embeddings using CodeBERT and store them in ChromaDB. But vector search alone often misses exact variable or type names, while keyword search misses semantic synonyms. To solve this, we implemented a hybrid search combining dense CodeBERT similarity with sparse BM25 keyword matching, merging them using Reciprocal Rank Fusion with a smoothing constant of k=60.<br><br>
+  We then inject the top-ranked codebase functions directly into the LLM prompt. This grounds the review in the repository's real-world patterns and drastically reduces hallucinated comments."</em>
+</blockquote>
+
+<hr style="border-top: 2px dashed #94a3b8; margin: 24px 0;">
+
+<p>Here is the complete beginner-to-expert breakdown of this bullet point.</p>
+
+<hr>
+
+<h3>The 10-Second Intuitive Mental Model</h3>
+
+<p>Imagine an automatic restaurant drive-thru:</p>
+<ul>
+  <li><strong>The Old/Bad Way (Polling):</strong> A waiter runs outside every 5 seconds screaming, <em>"Is there a car yet? Is there a car yet?"</em> (wasting energy and slowing down the computer).</li>
+  <li><strong>The Event-Driven Way (Your Pipeline):</strong> A sensor on the ground rings a chime the exact millisecond a car drives up (<strong>Webhook</strong>), the order is slipped onto a ticket carousel so the kitchen doesn’t get overwhelmed (<strong>Redis Queue</strong>), and the kitchen cooks and delivers the food in 11 seconds (<strong>~11-Second Automated Review</strong>).</li>
+</ul>
+
+<hr>
+
+<h3>Breaking Down Every Piece of the Bullet</h3>
+
+<pre>
+[Architected an event-driven AI code review pipeline]
+  ├── [intercepting GitHub pull requests via webhooks]
+  ├── [queuing jobs in Redis]
+  └── [delivering automated inline feedback in ~11 seconds]
+</pre>
+
+<hr>
+
+<h4>1. <em>"Architected an event-driven AI code review pipeline"</em></h4>
+<ul>
+  <li><strong>What "Event-Driven" Means:</strong> The system does <strong>not</strong> constantly check GitHub in a loop. It sits in a completely quiet, sleep state until an <strong>"event"</strong> happens (someone clicks <em>"Open Pull Request"</em> on GitHub). That single action fires off a chain reaction through your microservices.</li>
+  <li><strong>Why it matters:</strong> It consumes almost zero CPU when idle, but responds instantly the millisecond code is pushed.</li>
+</ul>
+
+<hr>
+
+<h4>2. <em>"intercepting GitHub pull requests via webhooks"</em></h4>
+<ul>
+  <li><strong>What a Webhook is:</strong> An automated HTTP <code>POST</code> message sent from one server to another. When you open a PR on GitHub, GitHub’s servers send a JSON letter to your Go server (<code>/webhook/github</code>) saying:
+    <blockquote><em>"Hey CodeSense! User Pranav just opened PR #1 on repository CryptoShield with commit SHA abc1234."</em></blockquote>
+  </li>
+  <li><strong>The Security Behind "Intercepting":</strong> Your Go Webhook Handler checks GitHub's secret cryptographic seal (<strong>HMAC-SHA256 signature</strong>). If a hacker tries to send fake fake requests, Go rejects it immediately using constant-time comparison (<code>hmac.Equal</code>).</li>
+  <li><strong>Idempotency Guard:</strong> It checks a Redis lock (<code>SetNX</code>) with a 5-minute timer so that if GitHub retries sending the same notification twice, your system won't review the same PR two times.</li>
+</ul>
+
+<hr>
+
+<h4>3. <em>"queuing jobs in Redis"</em></h4>
+<ul>
+  <li><strong>Why can't the Webhook Handler just call the AI directly?</strong>
+    <ul>
+      <li>If 30 developers open pull requests at 5:00 PM simultaneously, and each AI review takes 8 seconds, trying to run 30 heavy AI models at once would crash your server with an Out-of-Memory (OOM) error, or GitHub would timeout waiting for an HTTP response!</li>
+    </ul>
+  </li>
+  <li><strong>How the Redis Queue Works:</strong>
+    <ol>
+      <li>The Webhook Handler receives the notification, writes a tiny JSON job into a <strong>Redis List (<code>review_jobs</code>)</strong> using <code>LPUSH</code>, and immediately says <strong>"HTTP 200 OK" back to GitHub in 45 milliseconds</strong>.</li>
+      <li>A separate background worker running in Go uses <code>BRPOP</code> (Blocking Right Pop) to gently pull jobs off the list one by one at its own comfortable pace.</li>
+    </ol>
+  </li>
+  <li><strong>Why it matters:</strong> Redis acts as an <strong>elastic shock absorber</strong> that decouples your fast front-end gateway from your heavier AI processing engine.</li>
+</ul>
+
+<hr>
+
+<h4>4. <em>"delivering automated inline feedback in ~11 seconds"</em></h4>
+<ul>
+  <li><strong>What "Inline" Means:</strong> Most basic AI tools dump a giant 500-word paragraph at the very bottom of the PR page that nobody reads. <strong>Inline feedback</strong> means CodeSense attaches comments directly to the <strong>specific lines of code</strong> (e.g., placing a comment directly on Line 42 pointing out an unhandled database error).</li>
+  <li><strong>The ~11-Second Latency Breakdown:</strong>
+    <p>You can defend this exact stopwatch timing in an interview:</p>
+    <ul>
+      <li><strong>0.05s:</strong> Webhook received, HMAC verified, and pushed to Redis.</li>
+      <li><strong>0.31s:</strong> Review Worker pulls the job and downloads the code diff from GitHub.</li>
+      <li><strong>1.82s:</strong> Tree-Sitter parses the syntax and CodeBERT creates vector embeddings.</li>
+      <li><strong>0.06s:</strong> ChromaDB finds similar functions in your codebase.</li>
+      <li><strong>8.45s:</strong> Groq's high-speed chip (LPU) runs the LLM model to spot bugs.</li>
+      <li><strong>0.71s:</strong> Go worker verifies line numbers, posts comments to GitHub, and saves to PostgreSQL.</li>
+      <li><strong>Total: ~11.4 seconds!</strong></li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h3>How to Explain This in an Interview (Verbal Script)</h3>
+
+<p>If an interviewer asks:<br>
+<strong>"How does your backend handle pull request events from GitHub?"</strong></p>
+
+<p><strong>Your Answer:</strong></p>
+<blockquote>
+  <em>"We built an asynchronous, event-driven architecture to decouple webhook ingestion from our AI review engine.<br><br>
+  When an engineer opens or synchronizes a PR, GitHub dispatches an HMAC-SHA256 signed webhook to our Go gateway. We verify the signature in constant time and set an idempotency key in Redis using SetNX to eliminate duplicate processing on network retries.<br><br>
+  Instead of blocking the HTTP connection to run the LLM, the handler immediately pushes the job payload onto a Redis list using LPUSH and returns an HTTP 200 OK to GitHub in under 50 milliseconds. A dedicated Go worker daemon consumes from this queue using blocking pops (BRPOP), retrieves the unified diff via GitHub's REST API, and coordinates with our Python intelligence service.<br><br>
+  From the moment the PR is saved on GitHub to the moment inline review comments appear on the developer's diff lines, the entire pipeline completes in approximately 11 seconds."</em>
+</blockquote>
+
+<hr style="border-top: 2px dashed #94a3b8; margin: 24px 0;">
+
+<p>Here is the complete, beginner-to-expert explanation of your 3rd bullet:</p>
+
+<blockquote>
+  <strong>"• Built an automated diff-validation guard that verifies AI comments strictly target modified code, eliminating hallucinated line numbers and preventing GitHub API errors."</strong>
+</blockquote>
+
+<hr>
+
+<h3>The 10-Second Intuitive Mental Model</h3>
+
+<p>Imagine a teacher grading a student’s essay. The teacher is only supposed to grade the <strong>new paragraph</strong> the student wrote today.</p>
+<ul>
+  <li><strong>The Problem:</strong> The AI gets confused and tries to stick a sticky note on <strong>Page 50</strong> of the textbook, or on a paragraph that was written 3 years ago and never touched!</li>
+  <li><strong>The Solution (Your Guard):</strong> Before any sticky note is sent to GitHub, your code acts like an inspector holding a clipboard. It checks: <em>"Did the student actually change this exact line today? Yes? Approved. No? Throw the note in the trash."</em></li>
+</ul>
+
+<hr>
+
+<h3>The Real Technical Problem: Why was this guard mandatory?</h3>
+
+<p>When an LLM (like GPT or LLaMA) inspects a code diff, it often gets confused by line numbers:</p>
+<ol>
+  <li>It might suggest a fix on <strong>Line 120</strong>, but the developer only changed lines <strong>40 to 45</strong>.</li>
+  <li>If your backend attempts to call GitHub's API (<code>PullRequests.CreateReview</code>) to post an inline comment on Line 120, <strong>GitHub immediately crashes your request with an <code>HTTP 422 Unprocessable Entity</code> error</strong>.</li>
+  <li>Even worse, GitHub rejects the <strong>entire review batch</strong>—meaning even the 4 valid comments will get thrown away just because 1 comment had a bad line number!</li>
+</ol>
+
+<hr>
+
+<h3>Breaking Down Every Piece of the Bullet</h3>
+
+<pre>
+[Built an automated diff-validation guard]
+  ├── [that verifies AI comments strictly target modified code]
+  ├── [eliminating hallucinated line numbers]
+  └── [and preventing GitHub API errors]
+</pre>
+
+<hr>
+
+<h4>1. <em>"Built an automated diff-validation guard"</em></h4>
+<ul>
+  <li><strong>What a "Diff" is:</strong> Short for "Difference". When you change code on GitHub, GitHub doesn't send the entire file; it sends a <strong>diff</strong> showing what lines were deleted (<code>-</code>) and what lines were added (<code>+</code>).</li>
+  <li><strong>What a "Guard" is:</strong> A piece of defensive code that intercepts the AI's output before it reaches the outside world.</li>
+</ul>
+
+<hr>
+
+<h4>2. <em>"that verifies AI comments strictly target modified code"</em></h4>
+<ul>
+  <li>In your Go Review Worker (<code>worker.go</code>), before sending comments to GitHub, it parses the diff's "hunk headers" (e.g., <code>@@ -10,4 +10,6 @@</code>).</li>
+  <li>It creates a checklist (a hash set) of all the line numbers that have a <code>+</code> symbol next to them.</li>
+  <li>If the AI says: <em>"Put a comment on Line 42"</em>, the guard checks:
+    <ul>
+      <li>Is Line 42 on the checklist?</li>
+      <li>If <strong>YES</strong>, it allows it through.</li>
+      <li>If <strong>NO</strong>, the comment is discarded or safely remapped.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h4>3. <em>"eliminating hallucinated line numbers"</em></h4>
+<ul>
+  <li><strong>Hallucination</strong> in LLMs doesn't just mean making up facts; it also means <strong>making up coordinates</strong>.</li>
+  <li>LLMs are probabilistic language engines, not compilers. They are notoriously bad at counting lines accurately in raw text diffs.</li>
+  <li>This phrase tells the interviewer that you <strong>never trust an LLM blindly</strong>—you wrote deterministic software to verify its math.</li>
+</ul>
+
+<hr>
+
+<h4>4. <em>"and preventing GitHub API errors"</em></h4>
+<ul>
+  <li>This is the measurable engineering outcome.</li>
+  <li>Without this guard, your review worker would constantly fail with GitHub <code>HTTP 422</code> errors whenever the AI miscounted a line.</li>
+  <li>With this guard, your pipeline achieves <strong>100% API delivery reliability</strong>.</li>
+</ul>
+
+<hr>
+
+<h3>Why Interviewers Love This Line</h3>
+
+<p>Senior engineers love this bullet because it immediately separates you from junior developers who just built a basic "ChatGPT wrapper":</p>
+<ol>
+  <li><strong>It shows defensive programming:</strong> Junior engineers assume the LLM will always output perfect numbers. Senior engineers write validation filters to catch AI mistakes.</li>
+  <li><strong>It shows you built against real APIs:</strong> Anyone who has actually integrated with GitHub's Pull Request API knows about the dreaded <code>HTTP 422</code> error on invalid diff lines. Putting this on your resume proves you built a <strong>real, working production system</strong>.</li>
+</ol>
+
+<hr>
+
+<h3>How to Explain This in an Interview (Verbal Script)</h3>
+
+<p>If an interviewer points to this bullet and asks:<br>
+<strong>"Why did you build this validation guard? What would happen without it?"</strong></p>
+
+<p><strong>Your Answer:</strong></p>
+<blockquote>
+  <em>"When an LLM reviews a unified diff, it frequently miscounts line offsets and attempts to place comments on unchanged lines outside the diff hunk.<br><br>
+  GitHub's REST API enforces strict validation: if you submit an inline review comment targeting a line that wasn't modified in the pull request, GitHub rejects the entire review with an HTTP 422 Unprocessable Entity status code, causing the review job to fail.<br><br>
+  To solve this, our Go worker parses the git diff hunk headers into a hash set of valid added line numbers before making the API call. We cross-reference each LLM comment against this set. Any suggestion that targets an unchanged or out-of-bounds line is safely pruned, ensuring that 100% of the comments delivered to GitHub are valid and actionable."</em>
+</blockquote>
+
+</body>
+</html>
+"""
+
+def main():
+    html_file = os.path.abspath("Resume_Prep_CodeSense.html")
+    pdf_file = os.path.abspath("Resume Prep CodeSense.pdf")
+    
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    print(f"HTML written to {html_file}")
+    
+    edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+    cmd = f'Start-Process -FilePath "{edge_path}" -ArgumentList "--headless=new", "--disable-gpu", "--no-pdf-header-footer", "--print-to-pdf=`"{pdf_file}`"", "`"{html_file}`"" -Wait'
+    
+    print("Compiling PDF via Edge headless...")
+    subprocess.run(["powershell", "-Command", cmd], check=True)
+    
+    if os.path.exists(pdf_file):
+        reader = PyPDF2.PdfReader(pdf_file)
+        print(f"PDF successfully generated at {pdf_file}")
+        print(f"Total Page Count: {len(reader.pages)}")
+    else:
+        print("Error: PDF file was not created!")
+
+if __name__ == "__main__":
+    main()

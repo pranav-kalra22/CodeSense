@@ -1,0 +1,448 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ═══════════════════════════════════════════
+   THE VOID — Design Tokens
+   ═══════════════════════════════════════════ */
+:root {
+  --black: #050505;
+  --white: #f0f0f0;
+  --gray-100: #e5e5e5;
+  --gray-400: #737373;
+  --gray-600: #404040;
+  --gray-800: #1a1a1a;
+  --gray-900: #0d0d0d;
+
+  /* Colors only appear on interaction or severity */
+  --accent-1: #6366f1;
+  --accent-2: #8b5cf6;
+  --accent-3: #06b6d4;
+
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --green: #22c55e;
+
+  --font: 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+
+  --border-invisible: rgba(255, 255, 255, 0.04);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-visible: rgba(255, 255, 255, 0.15);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--black);
+  color: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   THE CARD — Invisible at rest, alive on hover
+   ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   THE CARD — Invisible at rest, alive on hover
+   ═══════════════════════════════════════════ */
+.void-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border-invisible);
+  border-radius: 12px;
+  padding: 1.5rem;
+  /* Smoother easing curve for a very premium lift */
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+/* The breathing gradient border */
+.void-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 13px;
+  padding: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-1),
+    var(--accent-2),
+    var(--accent-3),
+    var(--accent-1)
+  );
+  background-size: 300% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: smoothGradient 4s linear infinite;
+  pointer-events: none; 
+}
+
+@keyframes smoothGradient {
+  0% { background-position: 0% 0; }
+  100% { background-position: 300% 0; }
+}
+
+.void-card:hover {
+  background: rgba(255, 255, 255, 0.02);
+  /* INCREASED LIFT: Moves up 8px and scales slightly more */
+  transform: translateY(-8px) scale(1.02);
+  /* DEEPER SHADOW: Matches the higher elevation */
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(99, 102, 241, 0.06);
+}
+
+.void-card:hover::before {
+  opacity: 1;
+}
+
+.void-card:active {
+  transform: translateY(-2px) scale(1.005);
+  transition-duration: 0.1s;
+}
+/* ═══════════════════════════════════════════
+   ROW — For review lists
+   ═══════════════════════════════════════════ */
+.void-row {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-invisible);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+.void-row::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent-1), var(--accent-3));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.void-row:hover {
+  background: rgba(255, 255, 255, 0.015);
+}
+.void-row:hover::after {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════
+   SEVERITY — Tiny colored dots, not badges
+   ═══════════════════════════════════════════ */
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-red    { background: var(--red); box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+.dot-amber  { background: var(--amber); box-shadow: 0 0 6px rgba(245,158,11,0.5); }
+.dot-blue   { background: var(--blue); box-shadow: 0 0 6px rgba(59,130,246,0.5); }
+.dot-green  { background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+
+/* ═══════════════════════════════════════════
+   TYPOGRAPHY — Contrast is the design
+   ═══════════════════════════════════════════ */
+.text-huge  { font-size: 3rem; font-weight: 900; letter-spacing: -0.03em; line-height: 1; }
+.text-large { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+.text-body  { font-size: 0.9rem; color: var(--gray-400); }
+.text-muted { font-size: 0.8rem; color: var(--gray-600); }
+.text-mono  { font-family: var(--mono); font-size: 0.85rem; }
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in {
+  opacity: 0;
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger children delays */
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 80ms; }
+.stagger > *:nth-child(3) { animation-delay: 160ms; }
+.stagger > *:nth-child(4) { animation-delay: 240ms; }
+.stagger > *:nth-child(5) { animation-delay: 320ms; }
+.stagger > *:nth-child(6) { animation-delay: 400ms; }
+.stagger > *:nth-child(7) { animation-delay: 480ms; }
+.stagger > *:nth-child(8) { animation-delay: 560ms; }
+
+/* Skeleton loader */
+@keyframes skeletonBreathe {
+  0%, 100% { opacity: 0.02; }
+  50% { opacity: 0.05; }
+}
+.skeleton {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  animation: skeletonBreathe 2s ease-in-out infinite;
+}
+
+/* Scrollbar - nearly invisible */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+.nav-link:hover { color: var(--white) !important; background: rgba(255, 255, 255, 0.015) !important; }
+.nav-link:hover .nav-accent { opacity: 0.5 !important; }
+
+/* ═══════════════════════════════════════════
+   SMOOTH COLLAPSE (ACCORDION)
+   ═══════════════════════════════════════════ */
+.void-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.void-collapse.open {
+  grid-template-rows: 1fr;
+}
+
+.void-collapse-inner {
+  overflow: hidden;
+}
+
+/* --- Assistant UI --- */
+.assistant-input {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-invisible);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  width: 100%;
+  transition: border-color 0.3s;
+}
+.assistant-input:focus {
+  outline: none;
+  border-color: var(--accent-1);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.08);
+}
+
+.assistant-response {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-invisible);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  line-height: 1.7;
+  color: var(--gray-100);
+  white-space: pre-wrap; /* Preserves LLM newlines */
+}
+.assistant-response code {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-1);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+.breathing-skeleton {
+  animation: pulse 1.5s infinite;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+/* --- Reusable Neon Breathing Effect --- */
+@keyframes neonBreathe {
+  0% {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.05);
+  }
+  50% {
+    border-color: rgba(99, 102, 241, 0.8);
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.2);
+  }
+  100% {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.05);
+  }
+}
+
+.neon-pulse {
+  animation: neonBreathe 3s infinite ease-in-out;
+  border: 1px solid transparent; /* Required for the animation to grab onto */
+}
+
+.gradient-border-card {
+  position: relative;
+  background: var(--black); /* Keep the card dark inside */
+  border: none !important; /* Strip the standard solid border */
+  border-radius: 12px;
+}
+
+.gradient-border-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px; /* Expands exactly 1px outside the card */
+  border-radius: inherit; /* Perfectly matches the parent card */
+  padding: 1px; /* Thickness of the border */
+  background: linear-gradient(
+    90deg,
+    var(--accent-1),
+    var(--accent-2),
+    var(--accent-3),
+    var(--accent-1)
+  );
+  background-size: 300% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  
+  /* Set to 1 so it is constantly breathing without needing a hover! */
+  opacity: 1; 
+  pointer-events: none; 
+  animation: smoothGradient 4s linear infinite;
+}
+
+@keyframes smoothGradient {
+  0% { background-position: 0% 0; }
+  100% { background-position: 300% 0; }
+}
+
+/* ========================================== */
+/* EXPLORER CUSTOM DROPDOWN                   */
+/* ========================================== */
+.custom-select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 1rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 260px;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.custom-select-trigger:hover {
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06);
+}
+
+.custom-select-trigger.open {
+  border-color: rgba(99,102,241,0.6);
+  background: rgba(99,102,241,0.06);
+}
+
+.custom-select-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-1);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(99,102,241,0.6);
+}
+
+.custom-select-label {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-select-chevron {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.3);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.custom-select-chevron.open {
+  transform: rotate(180deg);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #0e0e10;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.custom-select-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  /* Add a subtle shadow so it pops over the AST tree */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+}
+
+.custom-select-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.custom-select-option:last-child {
+  border-bottom: none;
+}
+
+.custom-select-option:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--white);
+}
+
+.custom-select-option.selected {
+  color: var(--white);
+  background: rgba(99,102,241,0.08);
+}
+
+.custom-select-option-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-1);
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.custom-select-option.selected .custom-select-option-dot {
+  opacity: 1;
+}

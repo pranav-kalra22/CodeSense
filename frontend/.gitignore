@@ -1,0 +1,24 @@
+# --- Environment Variables (CRITICAL) ---
+.env
+*.env
+.env.*
+
+# --- Go Backend ---
+/bin/
+obj/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# --- Python Worker ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/

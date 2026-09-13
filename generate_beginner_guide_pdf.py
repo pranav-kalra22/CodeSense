@@ -1,5 +1,6 @@
 import os
 import subprocess
+# pyrefly: ignore [missing-import]
 import PyPDF2
 
 def build_html():

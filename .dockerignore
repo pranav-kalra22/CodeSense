@@ -1,0 +1,36 @@
+**/.git
+**/.gitignore
+**/.env
+**/.env.*
+!**/.env.example
+
+# Python
+**/__pycache__
+**/*.py[cod]
+**/*$py.class
+**/.pytest_cache
+**/.venv
+**/venv
+**/env
+
+# Frontend / Node
+**/node_modules
+**/dist
+**/build
+**/.npm
+**/.eslintcache
+
+# Go build artifacts
+**/*.exe
+**/*.test
+**/*.out
+**/bin
+
+# Local IDEs & OS metadata
+**/.vscode
+**/.idea
+**/.DS_Store
+Thumbs.db
+
+# Large documentation files
+*.pdf

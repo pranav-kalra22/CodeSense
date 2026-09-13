@@ -1,5 +1,12 @@
 # CodeSense — AI-Powered Code Review & Codebase Intelligence Platform
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)](https://golang.org)
+[![Python Version](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://python.org)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docker.com)
+[![LLM](https://img.shields.io/badge/LLM-Groq%20Cloud-f55036)](https://groq.com)
+
 CodeSense is an enterprise-grade, event-driven platform that intercepts GitHub Pull Requests, generates context-aware AI reviews using Retrieval-Augmented Generation (RAG) over your codebase's vector embeddings, and learns from developer feedback over time.
 
 ---
@@ -196,8 +203,8 @@ flowchart TD
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Darshan0403/ai-code-review.git
-cd ai-code-review
+git clone https://github.com/pranav-kalra22/CodeSense.git
+cd CodeSense
 
 # 2. Configure environment variables
 cp .env.example .env

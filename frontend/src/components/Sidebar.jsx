@@ -190,7 +190,7 @@ export default function Sidebar() {
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.2)' }}>
-              Darshan © 2026
+              Pranav @ 2026
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)' }} className="text-mono">

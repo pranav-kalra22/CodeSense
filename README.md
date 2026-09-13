@@ -4,8 +4,21 @@ CodeSense is an enterprise-grade, event-driven platform that intercepts GitHub P
 
 ---
 
+## 📚 Documentation & Technical Guides
+
+This repository includes three comprehensive, publication-grade guides:
+
+| Document | Description | Format |
+| :--- | :--- | :--- |
+| 📘 **[Technical Masterclass & Interview Defense Guide](./CodeSense_Complete_Technical_Masterclass_and_Interview_Defense_Guide.pdf)** | 29-page exhaustive engineering bible covering end-to-end architecture, mathematical proofs, RRF formulas, BERT anisotropy calibration, Devil's Advocate defenses, and 50 interview Q&As. | PDF |
+| 🚀 **[Beginner's Visual Guide to LLMs & RAG](./CodeSense_Beginners_Visual_Guide_to_LLMs_and_RAG.pdf)** | 9-page illustrated conceptual companion explaining LLMs, RAG, ASTs, and vector embeddings using intuitive analogies and diagrams. | PDF |
+| 🎯 **[Resume Preparation & Bullet Defense Guide](./Resume%20Prep%20CodeSense.pdf)** | Complete phrase-by-phrase technical deconstructions, mental models, stopwatch latency breakdowns, and verbal interview scripts for resume bullets. | PDF |
+
+---
+
 ## Table of Contents
 
+- [Documentation & Technical Guides](#-documentation--technical-guides)
 - [Overview](#overview)
 - [Architecture](#architecture)
 - [Features](#features)
